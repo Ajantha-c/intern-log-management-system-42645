@@ -1,15 +1,17 @@
-/* Login page: teal gradient + glassmorphism + two-card layout + modal popup */
+/* Login page: teal gradient + glassmorphism + minimal professional motion */
 
 :root {
+  --teal-0: #ecfeff;
+  --teal-1: #cffafe;
   --teal-2: #67e8f9;
   --teal-3: #22d3ee;
   --teal-4: #06b6d4;
   --teal-5: #0891b2;
+  --teal-6: #0e7490;
 
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-bg-strong: rgba(255, 255, 255, 0.14);
+  --glass-bg: rgba(255, 255, 255, 0.10);
   --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 22px 64px rgba(0, 0, 0, 0.22);
+  --glass-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
 
   --text-strong: rgba(255, 255, 255, 0.94);
   --text-soft: rgba(255, 255, 255, 0.72);
@@ -17,7 +19,6 @@
 
   --ease: cubic-bezier(0.2, 0.9, 0.2, 1);
   --dur: 420ms;
-  --stage-max: 980px;
 }
 
 .loginPage {
@@ -31,8 +32,7 @@
 .loginBg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(1200px 900px at 20% 10%, rgba(34, 211, 238, 0.35), transparent 55%),
+  background: radial-gradient(1200px 900px at 20% 10%, rgba(34, 211, 238, 0.35), transparent 55%),
     radial-gradient(900px 700px at 80% 40%, rgba(6, 182, 212, 0.25), transparent 55%),
     linear-gradient(135deg, #052c35 0%, #063948 45%, #052c35 100%);
   filter: saturate(1.05);
@@ -57,20 +57,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 26px;
 }
 
-.loginHeader,
-.roleRow,
-.loginFooter {
+.loginHeader {
+  text-align: center;
+  max-width: 720px;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 
-.loginShell.isEntered .loginHeader,
-.roleRow.isEntered,
-.loginFooter.isEntered {
+.loginHeader.isEntered {
   opacity: 1;
   transform: translateY(0);
 }
@@ -79,14 +77,14 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .brandDot {
@@ -94,32 +92,46 @@
   height: 10px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, var(--teal-2), var(--teal-5));
-  box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.1);
+  box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.10);
 }
 
 .brandText {
-  letter-spacing: 0.2px;
+  letter-spacing: 0.6px;
   font-weight: 700;
   color: var(--text-strong);
 }
 
-.loginSubtitle {
+.loginTitle {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: clamp(30px, 4vw, 40px);
+  letter-spacing: -0.02em;
+}
+
+.loginSubtitle {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--text-soft);
-  text-align: center;
-  max-width: 720px;
 }
 
 .roleRow {
-  width: min(var(--stage-max), 100%);
+  width: min(980px, 100%);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   align-items: stretch;
+
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 
+.roleRow.isEntered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glass cards */
 .roleCard {
   appearance: none;
   border: 1px solid var(--glass-border);
@@ -135,9 +147,9 @@
 
   transition:
     transform var(--dur) var(--ease),
+    opacity var(--dur) var(--ease),
     border-color var(--dur) var(--ease),
-    background-color var(--dur) var(--ease),
-    filter var(--dur) var(--ease);
+    background-color var(--dur) var(--ease);
 }
 
 .roleCard:focus-visible {
@@ -146,13 +158,12 @@
 }
 
 .roleCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(103, 232, 249, 0.38);
-  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(103, 232, 249, 0.35);
 }
 
 .roleCard:active {
-  transform: translateY(-1px) scale(0.992);
+  transform: translateY(-1px) scale(0.995);
 }
 
 .roleIcon {
@@ -162,7 +173,7 @@
 
 .roleLabel {
   font-size: 18px;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: -0.01em;
   margin-bottom: 6px;
 }
@@ -173,107 +184,97 @@
   line-height: 1.45;
 }
 
-/* ---- Modal popup ---- */
-
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 18px;
-  background: rgba(0, 0, 0, 0.45);
-
-  animation: overlayIn var(--dur) var(--ease) both;
+/* Popup slot lives between/within the grid once selection happens.
+   We keep the two cards in the DOM and animate the "other" one away. */
+.popupSlot {
+  display: none; /* only becomes visible when selection happens */
 }
 
-@keyframes overlayIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.roleRow.hasSelection {
+  grid-template-columns: 1fr 1fr;
 }
 
-.modal {
-  width: min(440px, 100%);
+.roleRow.hasSelection .popupSlot.isVisible {
+  display: block;
+}
+
+/* When mentor is selected:
+   - Intern card slides right->left and fades out
+   - Popup appears in the "empty space" (grid column 2)
+*/
+.roleRow.selectionMentor .mentorCard {
+  grid-column: 1;
+}
+.roleRow.selectionMentor .internCard {
+  grid-column: 2;
+}
+.roleRow.selectionMentor .popupSlot {
+  grid-column: 2;
+}
+
+/* When intern is selected:
+   - Mentor card slides left->right and fades out
+   - Popup appears in the "empty space" (grid column 1)
+*/
+.roleRow.selectionIntern .mentorCard {
+  grid-column: 1;
+}
+.roleRow.selectionIntern .internCard {
+  grid-column: 2;
+}
+.roleRow.selectionIntern .popupSlot {
+  grid-column: 1;
+}
+
+/* Hidden-away behavior:
+   "Intern slides smoothly from right to left and fades out" => translateX(-36px)
+   "Mentor slides smoothly from left to right and fades out" => translateX(+36px)
+*/
+.roleRow.selectionMentor .internCard.isHiddenAway {
+  opacity: 0;
+  transform: translateX(-36px);
+  pointer-events: none;
+}
+
+.roleRow.selectionIntern .mentorCard.isHiddenAway {
+  opacity: 0;
+  transform: translateX(36px);
+  pointer-events: none;
+}
+
+/* Selected card stays in place, but gets a subtle emphasis */
+.roleCard.isSelected {
+  border-color: rgba(34, 211, 238, 0.50);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Popup panel: scale-in + fade */
+.popupPanel {
+  height: 100%;
   border-radius: 18px;
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg-strong);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.10);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   box-shadow: var(--glass-shadow);
 
-  padding: 20px 18px;
+  padding: 22px 20px;
 
-  transform: translateY(10px) scale(0.985);
   opacity: 0;
-  animation: modalIn var(--dur) var(--ease) both;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 
-@keyframes modalIn {
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
+.popupPanel.isVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
-.modalHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.modalKicker {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.modalTitle {
-  margin-top: 6px;
+.popupTitle {
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 800;
   letter-spacing: -0.01em;
-}
-
-.modalClose {
-  appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-strong);
-  border-radius: 12px;
-  width: 38px;
-  height: 38px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: transform 180ms var(--ease), background-color 180ms var(--ease),
-    border-color 180ms var(--ease);
-}
-
-.modalClose:hover {
-  transform: translateY(-1px);
-  border-color: rgba(103, 232, 249, 0.4);
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.modalClose:active {
-  transform: translateY(0);
-}
-
-.modalClose {
-  font-size: 20px;
-  line-height: 1;
+  margin-bottom: 14px;
 }
 
 .googleBtn {
@@ -288,24 +289,22 @@
   background: rgba(255, 255, 255, 0.14);
   color: var(--text-strong);
 
-  font-weight: 750;
+  font-weight: 700;
   font-size: 14px;
   padding: 12px 14px;
 
   cursor: pointer;
-  transition: transform 180ms var(--ease), background-color 180ms var(--ease),
-    border-color 180ms var(--ease), filter 180ms var(--ease);
+  transition: transform 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease);
 }
 
 .googleBtn:hover {
   background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(103, 232, 249, 0.4);
+  border-color: rgba(103, 232, 249, 0.40);
   transform: translateY(-1px);
-  filter: saturate(1.05);
 }
 
 .googleBtn:active {
-  transform: translateY(0) scale(0.995);
+  transform: translateY(0);
 }
 
 .googleMark {
@@ -317,27 +316,24 @@
   justify-content: center;
   font-weight: 900;
   color: #0b1220;
-  background: linear-gradient(
-    135deg,
-    rgba(103, 232, 249, 0.95),
-    rgba(34, 211, 238, 0.85)
-  );
+  background: linear-gradient(135deg, rgba(103, 232, 249, 0.95), rgba(34, 211, 238, 0.85));
 }
 
-.modalFootnote {
+.popupFootnote {
   margin-top: 12px;
   font-size: 12px;
   color: var(--text-faint);
-  line-height: 1.45;
-}
-
-.panelRoleStrong {
-  color: rgba(255, 255, 255, 0.82);
-  text-transform: capitalize;
 }
 
 .loginFooter {
-  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.loginFooter.isEntered {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .footerNote {
@@ -345,36 +341,20 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Responsive */
+/* Responsive: stack cards and show popup under selected card */
 @media (max-width: 860px) {
-  .roleRow {
+  .roleRow,
+  .roleRow.hasSelection {
     grid-template-columns: 1fr;
   }
-}
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .loginHeader,
-  .roleRow,
-  .roleCard,
-  .modalOverlay,
-  .modal,
-  .googleBtn,
-  .modalClose,
-  .loginFooter {
-    transition: none !important;
-    animation: none !important;
+  .roleRow.selectionMentor .popupSlot,
+  .roleRow.selectionIntern .popupSlot {
+    grid-column: 1;
   }
 
-  .loginHeader,
-  .roleRow,
-  .loginFooter {
-    opacity: 1;
-    transform: none;
-  }
-
-  .modal {
-    opacity: 1;
-    transform: none;
+  .roleRow.selectionMentor .internCard.isHiddenAway,
+  .roleRow.selectionIntern .mentorCard.isHiddenAway {
+    transform: translateY(8px);
   }
 }
