@@ -1,1 +1,3 @@
-# intern-log-management-system-42645
+# Project Repository
+
+This is the initial README file for the project.
