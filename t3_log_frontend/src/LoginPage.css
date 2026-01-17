@@ -1,0 +1,360 @@
+/* Login page: teal gradient + glassmorphism + minimal professional motion */
+
+:root {
+  --teal-0: #ecfeff;
+  --teal-1: #cffafe;
+  --teal-2: #67e8f9;
+  --teal-3: #22d3ee;
+  --teal-4: #06b6d4;
+  --teal-5: #0891b2;
+  --teal-6: #0e7490;
+
+  --glass-bg: rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+  --text-strong: rgba(255, 255, 255, 0.94);
+  --text-soft: rgba(255, 255, 255, 0.72);
+  --text-faint: rgba(255, 255, 255, 0.55);
+
+  --ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --dur: 420ms;
+}
+
+.loginPage {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  color: var(--text-strong);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.loginBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1200px 900px at 20% 10%, rgba(34, 211, 238, 0.35), transparent 55%),
+    radial-gradient(900px 700px at 80% 40%, rgba(6, 182, 212, 0.25), transparent 55%),
+    linear-gradient(135deg, #052c35 0%, #063948 45%, #052c35 100%);
+  filter: saturate(1.05);
+}
+
+.loginBg::before {
+  content: "";
+  position: absolute;
+  inset: -80px;
+  background:
+    radial-gradient(380px 260px at 25% 25%, rgba(103, 232, 249, 0.18), transparent 60%),
+    radial-gradient(420px 320px at 65% 65%, rgba(34, 211, 238, 0.16), transparent 62%);
+  transform: rotate(-8deg);
+}
+
+.loginShell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 56px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+}
+
+.loginHeader {
+  text-align: center;
+  max-width: 720px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.loginHeader.isEntered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.brandPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+  margin-bottom: 14px;
+}
+
+.brandDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--teal-2), var(--teal-5));
+  box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.10);
+}
+
+.brandText {
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.loginTitle {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 40px);
+  letter-spacing: -0.02em;
+}
+
+.loginSubtitle {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.roleRow {
+  width: min(980px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.roleRow.isEntered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glass cards */
+.roleCard {
+  appearance: none;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  border-radius: 18px;
+  padding: 22px 20px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--glass-shadow);
+
+  transition:
+    transform var(--dur) var(--ease),
+    opacity var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.roleCard:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, 0.45);
+  outline-offset: 3px;
+}
+
+.roleCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(103, 232, 249, 0.35);
+}
+
+.roleCard:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+.roleIcon {
+  font-size: 28px;
+  margin-bottom: 14px;
+}
+
+.roleLabel {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.roleHint {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* Popup slot lives between/within the grid once selection happens.
+   We keep the two cards in the DOM and animate the "other" one away. */
+.popupSlot {
+  display: none; /* only becomes visible when selection happens */
+}
+
+.roleRow.hasSelection {
+  grid-template-columns: 1fr 1fr;
+}
+
+.roleRow.hasSelection .popupSlot.isVisible {
+  display: block;
+}
+
+/* When mentor is selected:
+   - Intern card slides right->left and fades out
+   - Popup appears in the "empty space" (grid column 2)
+*/
+.roleRow.selectionMentor .mentorCard {
+  grid-column: 1;
+}
+.roleRow.selectionMentor .internCard {
+  grid-column: 2;
+}
+.roleRow.selectionMentor .popupSlot {
+  grid-column: 2;
+}
+
+/* When intern is selected:
+   - Mentor card slides left->right and fades out
+   - Popup appears in the "empty space" (grid column 1)
+*/
+.roleRow.selectionIntern .mentorCard {
+  grid-column: 1;
+}
+.roleRow.selectionIntern .internCard {
+  grid-column: 2;
+}
+.roleRow.selectionIntern .popupSlot {
+  grid-column: 1;
+}
+
+/* Hidden-away behavior:
+   "Intern slides smoothly from right to left and fades out" => translateX(-36px)
+   "Mentor slides smoothly from left to right and fades out" => translateX(+36px)
+*/
+.roleRow.selectionMentor .internCard.isHiddenAway {
+  opacity: 0;
+  transform: translateX(-36px);
+  pointer-events: none;
+}
+
+.roleRow.selectionIntern .mentorCard.isHiddenAway {
+  opacity: 0;
+  transform: translateX(36px);
+  pointer-events: none;
+}
+
+/* Selected card stays in place, but gets a subtle emphasis */
+.roleCard.isSelected {
+  border-color: rgba(34, 211, 238, 0.50);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Popup panel: scale-in + fade */
+.popupPanel {
+  height: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--glass-shadow);
+
+  padding: 22px 20px;
+
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.popupPanel.isVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.popupTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+
+.googleBtn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-strong);
+
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 14px;
+
+  cursor: pointer;
+  transition: transform 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease);
+}
+
+.googleBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(103, 232, 249, 0.40);
+  transform: translateY(-1px);
+}
+
+.googleBtn:active {
+  transform: translateY(0);
+}
+
+.googleMark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #0b1220;
+  background: linear-gradient(135deg, rgba(103, 232, 249, 0.95), rgba(34, 211, 238, 0.85));
+}
+
+.popupFootnote {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.loginFooter {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.loginFooter.isEntered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.footerNote {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Responsive: stack cards and show popup under selected card */
+@media (max-width: 860px) {
+  .roleRow,
+  .roleRow.hasSelection {
+    grid-template-columns: 1fr;
+  }
+
+  .roleRow.selectionMentor .popupSlot,
+  .roleRow.selectionIntern .popupSlot {
+    grid-column: 1;
+  }
+
+  .roleRow.selectionMentor .internCard.isHiddenAway,
+  .roleRow.selectionIntern .mentorCard.isHiddenAway {
+    transform: translateY(8px);
+  }
+}
