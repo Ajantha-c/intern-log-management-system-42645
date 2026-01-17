@@ -5,17 +5,19 @@ import "./LoginPage.css";
  * Role options for the login UI.
  */
 const ROLES = {
-  mentor: {
-    key: "mentor",
-    label: "Mentor",
-    continueText: "Continue as Mentor",
-    icon: "🧑‍🏫",
-  },
   intern: {
     key: "intern",
     label: "Intern",
-    continueText: "Continue as Intern",
+    panelTitle: "Sign in as Intern",
     icon: "🧑‍💻",
+    hint: "Log work, progress, and updates.",
+  },
+  mentor: {
+    key: "mentor",
+    label: "Mentor",
+    panelTitle: "Sign in as Mentor",
+    icon: "🧑‍🏫",
+    hint: "Review intern logs and give feedback.",
   },
 };
 
@@ -26,13 +28,23 @@ function cx(...parts) {
   return parts.filter(Boolean).join(" ");
 }
 
+/**
+ * Returns the opposite role key.
+ * @param {string|null} role
+ * @returns {string|null}
+ */
+function getOtherRole(role) {
+  if (!role) return null;
+  return role === "intern" ? "mentor" : "intern";
+}
+
 // PUBLIC_INTERFACE
 function LoginPage() {
-  /** This is the T3 Log login UI page with role selection and animations (no auth wiring). */
+  /** Premium role-selection login UI with directional animations and a glass sign-in panel (UI only). */
   const [hasEntered, setHasEntered] = useState(false);
-  const [selectedRole, setSelectedRole] = useState(null); // "mentor" | "intern" | null
+  const [selectedRole, setSelectedRole] = useState(null); // "intern" | "mentor" | null
 
-  const popupRef = useRef(null);
+  const panelRef = useRef(null);
 
   useEffect(() => {
     // Trigger initial fade/slide-in animation after first paint.
@@ -45,13 +57,24 @@ function LoginPage() {
     return ROLES[selectedRole];
   }, [selectedRole]);
 
-  // Clicking outside the popup resets the view to the initial two-card layout.
+  const otherRole = useMemo(() => getOtherRole(selectedRole), [selectedRole]);
+
+  // Escape returns to role selection.
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === "Escape" && selectedRole) setSelectedRole(null);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedRole]);
+
+  // Click outside panel returns to role selection (desktop-friendly).
   useEffect(() => {
     if (!selectedRole) return;
 
     function onPointerDown(e) {
-      if (!popupRef.current) return;
-      if (popupRef.current.contains(e.target)) return;
+      if (!panelRef.current) return;
+      if (panelRef.current.contains(e.target)) return;
       setSelectedRole(null);
     }
 
@@ -59,79 +82,145 @@ function LoginPage() {
     return () => window.removeEventListener("pointerdown", onPointerDown);
   }, [selectedRole]);
 
+  // PUBLIC_INTERFACE
   function handleSelect(roleKey) {
+    /** Selects a role and transitions into the sign-in panel. */
     setSelectedRole(roleKey);
+  }
+
+  // PUBLIC_INTERFACE
+  function handleBack() {
+    /** Returns to the default two-card role selection layout. */
+    setSelectedRole(null);
+  }
+
+  // PUBLIC_INTERFACE
+  function handleGoogleSignIn() {
+    /**
+     * Placeholder for Google Sign-In.
+     * Requirement: preserve selectedRole during auth and then redirect:
+     * - intern -> Intern Dashboard
+     * - mentor -> Mentor Dashboard
+     *
+     * This project currently has no auth wiring; this handler is intentionally UI-only.
+     */
+    // no-op
   }
 
   return (
     <main className="loginPage" aria-label="T3 Log Login">
       <div className="loginBg" aria-hidden="true" />
 
+      {/* Subtle focus/blur overlay when a role is selected */}
+      <div
+        className={cx("focusOverlay", selectedRole && "isActive")}
+        aria-hidden="true"
+      />
+
       <section className="loginShell">
         <header className={cx("loginHeader", hasEntered && "isEntered")}>
           <div className="brandPill" aria-label="T3 Log">
             <span className="brandDot" aria-hidden="true" />
-            <span className="brandText">T3 Log</span>
+            <span className="brandText">Welcome to T3Log</span>
           </div>
-          <h1 className="loginTitle">Welcome</h1>
-          <p className="loginSubtitle">Choose your role to continue.</p>
+          <p className="loginSubtitle">
+            Choose your role to continue. Secure sign-in powered by Google.
+          </p>
         </header>
 
         <div
           className={cx(
-            "roleRow",
+            "stage",
             hasEntered && "isEntered",
             selectedRole && "hasSelection",
-            selectedRole === "mentor" && "selectionMentor",
-            selectedRole === "intern" && "selectionIntern"
+            selectedRole === "intern" && "selectionIntern",
+            selectedRole === "mentor" && "selectionMentor"
           )}
         >
-          {/* Mentor Card */}
-          <button
-            type="button"
-            className={cx(
-              "roleCard",
-              "mentorCard",
-              selectedRole === "mentor" && "isSelected",
-              selectedRole === "intern" && "isHiddenAway"
-            )}
-            onClick={() => handleSelect("mentor")}
-            aria-label="Continue as Mentor"
-          >
-            <div className="roleIcon" aria-hidden="true">
-              {ROLES.mentor.icon}
-            </div>
-            <div className="roleLabel">{ROLES.mentor.label}</div>
-            <div className="roleHint">Review intern logs and give feedback.</div>
-          </button>
+          {/* Default state requirement: Intern left, Mentor right */}
+          <div className="roleRow" role="group" aria-label="Role selection">
+            {/* Intern Card (left) */}
+            <button
+              type="button"
+              className={cx(
+                "roleCard",
+                "internCard",
+                selectedRole === "intern" && "isSelected",
+                selectedRole === "mentor" && "isHiddenAway"
+              )}
+              onClick={() => handleSelect("intern")}
+              aria-label="Continue as Intern"
+              aria-pressed={selectedRole === "intern"}
+            >
+              <div className="roleIcon" aria-hidden="true">
+                {ROLES.intern.icon}
+              </div>
+              <div className="roleLabel">{ROLES.intern.label}</div>
+              <div className="roleHint">{ROLES.intern.hint}</div>
+            </button>
 
-          {/* Popup Panel (occupies the empty space when a role is selected) */}
-          <div
+            {/* Mentor Card (right) */}
+            <button
+              type="button"
+              className={cx(
+                "roleCard",
+                "mentorCard",
+                selectedRole === "mentor" && "isSelected",
+                selectedRole === "intern" && "isHiddenAway"
+              )}
+              onClick={() => handleSelect("mentor")}
+              aria-label="Continue as Mentor"
+              aria-pressed={selectedRole === "mentor"}
+            >
+              <div className="roleIcon" aria-hidden="true">
+                {ROLES.mentor.icon}
+              </div>
+              <div className="roleLabel">{ROLES.mentor.label}</div>
+              <div className="roleHint">{ROLES.mentor.hint}</div>
+            </button>
+          </div>
+
+          {/* Sliding sign-in panel */}
+          <aside
             className={cx(
-              "popupSlot",
-              selectedRole && "isVisible",
-              selectedRole === "mentor" && "forMentor",
-              selectedRole === "intern" && "forIntern"
+              "signInPanel",
+              selectedRole && "isOpen",
+              selectedRole === "intern" ? "fromLeft" : null,
+              selectedRole === "mentor" ? "fromRight" : null
             )}
             aria-hidden={!selectedRole}
           >
             <div
-              ref={popupRef}
-              className={cx("popupPanel", selectedRole && "isVisible")}
+              ref={panelRef}
+              className={cx("signInPanelInner", selectedRole && "isVisible")}
               role="dialog"
               aria-modal="true"
-              aria-label={roleData ? roleData.continueText : "Continue"}
+              aria-label={roleData ? roleData.panelTitle : "Sign in"}
             >
-              <div className="popupTitle">{roleData ? roleData.continueText : ""}</div>
+              <div className="panelTopRow">
+                <div className="panelTitleBlock">
+                  <div className="panelKicker">Google Sign-In</div>
+                  <div className="panelTitle">
+                    {roleData ? roleData.panelTitle : ""}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="panelCloseBtn"
+                  onClick={handleBack}
+                  aria-label="Back to role selection"
+                  title="Back"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
 
               <button
                 type="button"
                 className="googleBtn"
-                onClick={() => {
-                  // Intentionally no auth wiring yet.
-                  // This placeholder allows future wiring without changing UI structure.
-                }}
-                aria-label="Google Sign-In (placeholder)"
+                onClick={handleGoogleSignIn}
+                aria-label="Sign in with Google"
               >
                 <span className="googleMark" aria-hidden="true">
                   G
@@ -139,35 +228,33 @@ function LoginPage() {
                 <span>Sign in with Google</span>
               </button>
 
-              <div className="popupFootnote">
-                Click outside this panel to go back.
+              <div className="panelFootnote">
+                Selected role:{" "}
+                <strong className="panelRoleStrong">
+                  {selectedRole ? selectedRole : ""}
+                </strong>
+                {otherRole ? (
+                  <>
+                    {" "}
+                    •{" "}
+                    <button
+                      type="button"
+                      className="inlineLink"
+                      onClick={() => handleSelect(otherRole)}
+                      aria-label={`Switch to ${otherRole}`}
+                    >
+                      Switch to {otherRole}
+                    </button>
+                  </>
+                ) : null}
               </div>
             </div>
-          </div>
-
-          {/* Intern Card */}
-          <button
-            type="button"
-            className={cx(
-              "roleCard",
-              "internCard",
-              selectedRole === "intern" && "isSelected",
-              selectedRole === "mentor" && "isHiddenAway"
-            )}
-            onClick={() => handleSelect("intern")}
-            aria-label="Continue as Intern"
-          >
-            <div className="roleIcon" aria-hidden="true">
-              {ROLES.intern.icon}
-            </div>
-            <div className="roleLabel">{ROLES.intern.label}</div>
-            <div className="roleHint">Log work, progress, and updates.</div>
-          </button>
+          </aside>
         </div>
 
         <footer className={cx("loginFooter", hasEntered && "isEntered")}>
           <span className="footerNote">
-            Minimal UI only — authentication will be wired later.
+            UI only — authentication + redirects will be wired later.
           </span>
         </footer>
       </section>
